@@ -165,7 +165,17 @@ When a link cost in the network increases, a count-to-infinity problem can occur
 % example topology
 Poisonous reverse fails if a count-to-infinity problem triggers a loop of three or more nodes \cite[p.~378]{cn}.
 
-Let us consider a network of 4 routers, $A$, $B$, $C$ and $D$. The network is represented below in Figure~\ref{fig:fail}.
+Let us consider a network of 4 routers, $A$, $B$, $C$ and $D$. The network is represented below in Figure~\ref{fig:fail}. For this example, we will analyse partial routing tables which show the different path costs from one node to all of the others in the network. The example is inspired by~\cite{berkeley}.
+
+\begin{description}
+\item[Initial situation] Initially, all links have a cost of 1. The routing tables for nodes $A$ and $B$ are represented in Tables~\ref{tab:inita} and~\ref{tab:initb}. The least-cost routes to the different nodes in the network are emphasised in blue. In Table~\ref{tab:inita}, any path through $D$ has an $\infty$ cost because $A$ and $D$ are not connected, and to go via $D$, there is always a back-and-forth. In Table~\ref{tab:initb}, the two $\infty$ result directly from poisonous reverse, since $A$ and $C$ route through $B$ to get to $D$.
+
+\item[Step 1] The cost of the link between $B$ and $D$ changes from 1 to 50. $B$ and $D$ get the information and update their tables. $B$'s new routing table is given in Table~\ref{tab:step1}.
+
+\item[Step 2] $B$ sends its updated table across the network. $A$ gets the information and updates its own table, given in Table~\ref{tab:step2}. $A$ believes there is a path via $C$, not knowing that $C$ also routes via $B$.
+
+\item[Step 3] $B$ gets the update from $A$ and updates its own table, as can be seen in Table~\ref{tab:step3}. As $A$ advertises a route through $C$, $B$ now also thinks there is a path with a lesser cost than 50 to $D$. From here on, we can see that a count-to-infinity situation occurs and will not stop until the actual cost is detected, requiring 47 more updates between $A$ and $B$ (leaving $C$ out).
+\end{description}
 
 \begin{figure}[!ht]
 \centering
@@ -175,65 +185,75 @@ Let us consider a network of 4 routers, $A$, $B$, $C$ and $D$. The network is re
 \end{figure}
 
 \begin{table}[!ht]
+\begin{minipage}{0.5\textwidth}
 \centering
 \begin{tabular}{c|ccc}
-	& \multicolumn{3}{c}{\textit{via}} \\
-	&	B			&	C			&	D			\\
+	& \multicolumn{3}{c}{\textit{via}} 						\\
+	&	B			&	C			&	D					\\
 \hline
 B	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
 C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
 D	&	\textcolor{Cyan}{2}	&	3			&	$\infty$	\\
 \end{tabular}
-\caption{A's initial routing table}
-\end{table}
-
-\begin{table}[!ht]
+\caption{$A$'s initial routing table}
+\label{tab:inita}
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
 \centering
 \begin{tabular}{c|ccc}
-	&	A			&	C			&	D			\\
+	& \multicolumn{3}{c}{\textit{via}} 						\\
+	&	A			&	C			&	D					\\
 \hline
 A	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
 C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
 D	&	$\infty$	&	$\infty$	&	\textcolor{Cyan}{1}	\\
 \end{tabular}
-\caption{B's initial routing table}
+\caption{$B$'s initial routing table}
+\label{tab:initb}
+\end{minipage}
 \end{table}
 
 \begin{table}[!ht]
 \centering
 \begin{tabular}{c|ccc}
-	&	A			&	C			&	D			\\
+	& \multicolumn{3}{c}{\textit{via}} 						\\
+	&	A			&	C			&	D					\\
 \hline
 A	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
 C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
-D	&	$\infty$	&	$\infty$	&	\textcolor{Cyan}{50}	\\
+D	&	$\infty$	&	$\infty$	&	\textcolor{Cyan}{50}\\
 \end{tabular}
-\caption{B's routing table after step 1}
+\caption{$B$'s routing table after step 1}
+\label{tab:step1}
 \end{table}
 
 \begin{table}[!ht]
 \centering
 \begin{tabular}{c|ccc}
-	& \multicolumn{3}{c}{\textit{via}} \\
-	&	B			&	C			&	D			\\
+	& \multicolumn{3}{c}{\textit{via}} 						\\
+	&	B			&	C			&	D					\\
 \hline
 B	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
 C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
-D	&	51			&	\textcolor{Cyan}{3}			&	$\infty$	\\
+D	&	51			&	\textcolor{Cyan}{3}	&	$\infty$	\\
 \end{tabular}
-\caption{A's routing table after step 2}
+\caption{$A$'s routing table after step 2}
+\label{tab:step2}
 \end{table}
 
 \begin{table}[!ht]
 \centering
 \begin{tabular}{c|ccc}
-	&	A			&	C			&	D			\\
+	& \multicolumn{3}{c}{\textit{via}} 						\\
+	&	A			&	C			&	D					\\
 \hline
 A	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
 C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
 D	&	\textcolor{Cyan}{4}	&	$\infty$	&	50			\\
 \end{tabular}
-\caption{B's routing table after step 3}
+\caption{$B$'s routing table after step 3}
+\label{tab:step3}
 \end{table}
 
 \paragraph{Solutions}

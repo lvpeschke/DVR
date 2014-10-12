@@ -1,9 +1,16 @@
-\begin{thebibliography}{KR13}
+\begin{thebibliography}{She12}
 
 \bibitem[KR13]{cn}
 James~F. Kurose and Keith~W. Ross.
 \newblock {\em Computer Networking: A Top-Down Approach}.
 \newblock Pearson, 6th edition, 2013.
+
+\bibitem[She12]{berkeley}
+Scott Shenker.
+\newblock Poison {R}everse.
+\newblock
+  \url{http://www-inst.eecs.berkeley.edu/~ee122/fa12/discussion/Section108_Answers.pdf},
+  Fall 2012.
 
 \bibitem[Siu99]{mit}
 Prof. K.-Y.~(Sunny) Siu.
