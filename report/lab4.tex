@@ -26,6 +26,7 @@
 \usepackage{eurosym}
 \usepackage{url}
 \usepackage{hyperref}
+\usepackage{color}
 
 \usepackage{todonotes}
 
@@ -164,9 +165,82 @@ When a link cost in the network increases, a count-to-infinity problem can occur
 % example topology
 Poisonous reverse fails if a count-to-infinity problem triggers a loop of three or more nodes \cite[p.~378]{cn}.
 
+Let us consider a network of 4 routers, $A$, $B$, $C$ and $D$. The network is represented below in Figure~\ref{fig:fail}.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.35\textwidth]{Fail.png}
+\caption{Example topology where poisoned reverse fails.}
+\label{fig:fail}
+\end{figure}
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{c|ccc}
+	& \multicolumn{3}{c}{\textit{via}} \\
+	&	B			&	C			&	D			\\
+\hline
+B	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
+C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
+D	&	\textcolor{Cyan}{2}	&	3			&	$\infty$	\\
+\end{tabular}
+\caption{A's initial routing table}
+\end{table}
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{c|ccc}
+	&	A			&	C			&	D			\\
+\hline
+A	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
+C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
+D	&	$\infty$	&	$\infty$	&	\textcolor{Cyan}{1}	\\
+\end{tabular}
+\caption{B's initial routing table}
+\end{table}
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{c|ccc}
+	&	A			&	C			&	D			\\
+\hline
+A	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
+C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
+D	&	$\infty$	&	$\infty$	&	\textcolor{Cyan}{50}	\\
+\end{tabular}
+\caption{B's routing table after step 1}
+\end{table}
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{c|ccc}
+	& \multicolumn{3}{c}{\textit{via}} \\
+	&	B			&	C			&	D			\\
+\hline
+B	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
+C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
+D	&	51			&	\textcolor{Cyan}{3}			&	$\infty$	\\
+\end{tabular}
+\caption{A's routing table after step 2}
+\end{table}
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{c|ccc}
+	&	A			&	C			&	D			\\
+\hline
+A	& 	\textcolor{Cyan}{1}	&	2			&	$\infty$	\\
+C	&	2			&	\textcolor{Cyan}{1}	&	$\infty$	\\
+D	&	\textcolor{Cyan}{4}	&	$\infty$	&	50			\\
+\end{tabular}
+\caption{B's routing table after step 3}
+\end{table}
+
 \paragraph{Solutions}
-\todo[inline]{find solutions}
-% find them
+In practise, the Routing Information Protocol (RIP) uses DVR with poisoned reverse where infinity is 16 hops. This does not avoid the count-to-infinity problem, but limits the damage by stopping updates after it reaches `ìnfinity''.
+In addition, \textit{hold-down timers} can be used: if a route becomes unusable, it is kept in the tables with an infinity value for a certain amount of time. If an update advertises a better or equally good route, it is replaced. On the other hand, if the update indicates a worse cost, it is ignored. 
+
+Another solution (which actually solves the problem) is using \textit{path vectors}: in addition to the distance vectors, we can keep a record of the path, i. e. the nodes traversed to obtain the cost. When a link cost increases or a link disappears from the network, a node can check if the path is still valid by looking it up. This is used in BGP~\cite{mit}.
 
 \bibliographystyle{alpha}
 \bibliography{biblio}

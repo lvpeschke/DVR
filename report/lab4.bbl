@@ -5,4 +5,10 @@ James~F. Kurose and Keith~W. Ross.
 \newblock {\em Computer Networking: A Top-Down Approach}.
 \newblock Pearson, 6th edition, 2013.
 
+\bibitem[Siu99]{mit}
+Prof. K.-Y.~(Sunny) Siu.
+\newblock Distance-vector routing (distributed {B}ellman-{F}ord algorithm).
+\newblock \url{http://web.mit.edu/course/2/2.993/www/lectures/lecture14.txt},
+  April 1999.
+
 \end{thebibliography}
