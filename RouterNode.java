@@ -120,14 +120,16 @@ public class RouterNode {
       if ( i == myID )
         continue;
       it = neighbors.iterator();
-      distance_table[myID][i] = costs[dest];
+      min = costs[dest];
       while ( it.hasNext() ) {
         int tmp = it.next();
-        if ( distance_table[myID][i] > costs[tmp] + distance_table[tmp][i] ) {
-          distance_table[myID][i] = costs[tmp] + distance_table[tmp][i];
-          changed = true;
+        if ( min > costs[tmp] + distance_table[tmp][i] ) {
+          min = costs[tmp] + distance_table[tmp][i];
         }
       }
+      if ( distance_table[myID][i] != min )
+        changed = true;
+      distance_table[myID][i] = min;
     }
 
     it = neighbors.iterator();
