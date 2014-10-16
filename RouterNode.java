@@ -6,7 +6,8 @@ public class RouterNode {
   private int myID;
   private GuiTextArea myGUI;
   private RouterSimulator sim;
-  private int[] costs = new int[RouterSimulator.NUM_NODES];
+  private int[] costs  = new int[RouterSimulator.NUM_NODES];
+  private int[] routes = new int[RouterSimulator.NUM_NODES];
   
   //Distance table stored in node/router
   private int[][] distance_table = new int[RouterSimulator.NUM_NODES][RouterSimulator.NUM_NODES];
@@ -27,6 +28,7 @@ public class RouterNode {
     for ( int i=0; i<RouterSimulator.NUM_NODES; i++ ) {
       for ( int j=0; j<RouterSimulator.NUM_NODES; j++) {
         distance_table[i][j] = RouterSimulator.INFINITY;
+        routes[j] = RouterSimulator.INFINITY;
       }
     }
 
@@ -35,6 +37,7 @@ public class RouterNode {
       distance_table[myID][i] = costs[i];
       if ( costs[i] != RouterSimulator.INFINITY && costs[i] != 0  ) {
         neighbors.add(i);
+        routes[i] = i;
       }
     }
 
@@ -60,12 +63,12 @@ public class RouterNode {
       if ( i == myID )
         continue;
       it = neighbors.iterator();
-      //min = RouterSimulator.INFINITY;
-      min = costs[i];
+      min = RouterSimulator.INFINITY;
       while ( it.hasNext() ) {
         int tmp = it.next();
         if ( min > costs[tmp] + distance_table[tmp][i] ) {
-          min = costs[tmp] + distance_table[tmp][i];  
+          min = costs[tmp] + distance_table[tmp][i];
+          routes[i] = tmp;  
         }
      }
      if ( min != distance_table[myID][i] )
@@ -85,7 +88,14 @@ public class RouterNode {
 
   //--------------------------------------------------
   private void sendUpdate(RouterPacket pkt) {
-    sim.toLayer2(pkt);
+    if ( RouterSimulator.POISONED_REVERSE ) {
+      for ( int i=0; i<RouterSimulator.NUM_NODES; i++ ) {
+        if ( routes[i] == pkt.destid )
+          pkt.mincost[i] = RouterSimulator.INFINITY;
+      }
+    }
+  
+  sim.toLayer2(pkt);
 
   }
   
@@ -114,6 +124,7 @@ public class RouterNode {
                 myGUI.println(" Node " + i + " " + Arrays.toString(distance_table[i]));
         }
         myGUI.println (" Real cost " + Arrays.toString(costs));
+        myGUI.println (" Route " + Arrays.toString(routes));
         myGUI.println ();
     }
 
@@ -132,11 +143,12 @@ public class RouterNode {
       if ( i == myID )
         continue;
       it = neighbors.iterator();
-      min = costs[dest];
+      min = RouterSimulator.INFINITY;
       while ( it.hasNext() ) {
         int tmp = it.next();
         if ( min > costs[tmp] + distance_table[tmp][i] ) {
           min = costs[tmp] + distance_table[tmp][i];
+          routes[i] = tmp;
         }
       }
       if ( distance_table[myID][i] != min )
