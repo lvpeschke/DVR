@@ -22,6 +22,7 @@ public class RouterNode {
     myGUI = new GuiTextArea("  Output window for Router #"+ ID + "  ");
     System.arraycopy(costs, 0, this.costs, 0, RouterSimulator.NUM_NODES);
     Iterator<Integer> it;  
+    
     //Initialize the distance_table array with infinity values
     for ( int i=0; i<RouterSimulator.NUM_NODES; i++ ) {
       for ( int j=0; j<RouterSimulator.NUM_NODES; j++) {
@@ -60,18 +61,17 @@ public class RouterNode {
         continue;
       it = neighbors.iterator();
       //min = RouterSimulator.INFINITY;
-      min = distance_table[myID][i];
+      min = costs[i];
       while ( it.hasNext() ) {
         int tmp = it.next();
-        if ( min > distance_table[myID][tmp] + distance_table[tmp][i] ) {
-          min = distance_table[myID][tmp] + distance_table[tmp][i];
+        if ( min > costs[tmp] + distance_table[tmp][i] ) {
+          min = costs[tmp] + distance_table[tmp][i];  
         }
-        if ( distance_table[myID][i] != min )  
-          changed = true;
-      }
+     }
+     if ( min != distance_table[myID][i] )
+        changed = true;
       distance_table[myID][i] = min;
     }
-
     //If some change in distance table occured, send updae to all neighbors
     if ( changed ) {
       it = neighbors.iterator();
@@ -82,7 +82,6 @@ public class RouterNode {
 
     printDistanceTable();
   }
-  
 
   //--------------------------------------------------
   private void sendUpdate(RouterPacket pkt) {
@@ -99,9 +98,10 @@ public class RouterNode {
 
     Iterator<Integer> it = neighbors.iterator();
     while ( it.hasNext() ) {
-      myGUI.println("nbr " + Arrays.toString(distance_table[it.next()]));  
+      int next = it.next();
+      myGUI.println("nbr " + next + " " + Arrays.toString(distance_table[next]));  
     }
-    myGUI.println ( "cost " + Arrays.toString(distance_table[myID]));
+    myGUI.println ( "cost " + Arrays.toString(costs));
     myGUI.println ();
   }
 
@@ -109,8 +109,9 @@ public class RouterNode {
   public void updateLinkCost(int dest, int newcost) {
     myGUI.println ( "LINK COST FROM " + myID + " TO " + dest + " HAS CHANGED FROM " + distance_table[myID][dest] 
       + " TO " + newcost + ". PREPARE TO BE ASSIMILATED. RESISTANCE IS FUTILE." );
-    distance_table[myID][dest] = newcost;
+    costs[dest] = newcost;
     int min = RouterSimulator.INFINITY;
+    boolean changed = false; 
 
     Iterator<Integer> it = neighbors.iterator();
 
@@ -119,21 +120,23 @@ public class RouterNode {
       if ( i == myID )
         continue;
       it = neighbors.iterator();
-      min = RouterSimulator.INFINITY;
+      distance_table[myID][i] = costs[dest];
       while ( it.hasNext() ) {
         int tmp = it.next();
-        if ( min > distance_table[myID][tmp] + distance_table[tmp][i] ) {
-          min = distance_table[myID][tmp] + distance_table[tmp][i];
+        if ( distance_table[myID][i] > costs[tmp] + distance_table[tmp][i] ) {
+          distance_table[myID][i] = costs[tmp] + distance_table[tmp][i];
+          changed = true;
         }
       }
-      distance_table[myID][i] = min;
     }
 
     it = neighbors.iterator();
 
     //If something changed, send updated distance vector to all neighbors{
-    while ( it.hasNext() ) {
-      sendUpdate( new RouterPacket ( myID, it.next(), distance_table[myID] ) );        
+    if ( changed ) {
+      while ( it.hasNext() ) {
+        sendUpdate( new RouterPacket ( myID, it.next(), distance_table[myID] ) );        
+      }
     }
     printDistanceTable();
 
