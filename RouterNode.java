@@ -125,6 +125,7 @@ public class RouterNode {
         }
         myGUI.println (" Real cost " + Arrays.toString(costs));
         myGUI.println (" Route " + Arrays.toString(routes));
+        myGUI.println ( "TEST: " + F.format( distance_table[myID], 4 ) );
         myGUI.println ();
     }
 

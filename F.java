@@ -1,6 +1,5 @@
 class F {
-  final static String SPACES = "                                                
-                                                    ";
+  final static String SPACES = "                                                                                                    ";
     public static String format(String s, int len){
     int slen = len-s.length();
 
@@ -17,6 +16,15 @@ class F {
     public static String format(Object x, int len){
     return format(String.valueOf(x), len);
     }
+
+    public static String format(int[] array, int len) {
+        String result = "";
+        for ( int i=0; i<RouterSimulator.NUM_NODES; i++ ) {
+            result += F.format(String.valueOf(array[i]), len);
+        }
+        return result;
+    }
+
 
     public static String format(long x, int len){
     return format(String.valueOf(x), len);
