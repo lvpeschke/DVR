@@ -7,7 +7,7 @@ class F {
         slen = SPACES.length();
   
     if(slen > 0)
-        return SPACES.substring(0,slen)+s;
+        return s+SPACES.substring(0,slen);
     else
         return s;
 
