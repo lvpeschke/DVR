@@ -11,10 +11,7 @@ public class RouterNode {
   
   //Distance table stored in node/router
   private int[][] distance_table = new int[RouterSimulator.NUM_NODES][RouterSimulator.NUM_NODES];
-  private Set<Integer> neighbors = new HashSet<Integer>(5);  
-
-  // private boolean[] neighbors = new boolean[RouterSimulator.NUM_NODES];
-  // private int[] route = new int[RouterSimulator.NUM_NODES];
+  private Set<Integer> neighbors = new HashSet<Integer>(5);
 
   //--------------------------------------------------
   public RouterNode(int ID, RouterSimulator sim, int[] costs) {
@@ -98,35 +95,6 @@ public class RouterNode {
   sim.toLayer2(pkt);
 
   }
-  
-
-  //--------------------------------------------------
-    public void printDistanceTable() {
-        
-        myGUI.println(" Table for " + myID +
-                      " at t=" + sim.getClocktime());
-        
-        /*myGUI.println("nbr " + myID + Arrays.toString(distance_table[myID]));
-         Iterator<Integer> it = neighbors.iterator();
-         while ( it.hasNext() ) {
-         int next = it.next();
-         myGUI.println("nbr " + next + Arrays.toString(distance_table[next]));
-         }
-         myGUI.println ( "real cost " + Arrays.toString(costs));
-         myGUI.println ();*/
-        
-        // print all of the distances
-        for (int i=0; i<RouterSimulator.NUM_NODES; i++) {
-            if (i == myID)
-                myGUI.println(" Node " + i + " " + Arrays.toString(distance_table[i])
-                              + " *");
-            else
-                myGUI.println(" Node " + i + " " + Arrays.toString(distance_table[i]));
-        }
-        myGUI.println (" Real cost " + Arrays.toString(costs));
-        myGUI.println (" Route " + Arrays.toString(routes));
-        myGUI.println ();
-    }
 
   //--------------------------------------------------
   public void updateLinkCost(int dest, int newcost) {
@@ -167,5 +135,31 @@ public class RouterNode {
     printDistanceTable();
 
   }
+    
+    //--------------------------------------------------
+    public void printDistanceTable() {
+        
+        myGUI.println ("------------------------------");
+        myGUI.println(" Table for " + myID +
+                      " at t=" + sim.getClocktime());
+        myGUI.println ("");
+        
+        // neighbors
+        Iterator<Integer> it = neighbors.iterator();
+        while (it.hasNext()) {
+            int next = it.next();
+            myGUI.println(F.format(" Node " + next, 16) + Arrays.toString(distance_table[next]));
+        }
+        myGUI.println ("");
+        // yourself
+        myGUI.println(F.format(" Best cost ", 16) + Arrays.toString(distance_table[myID])+ " *");
+        // route
+        myGUI.println (F.format(" Routes ", 17) + Arrays.toString(routes));
+        // cost
+        myGUI.println (F.format(" Link cost ", 16) + Arrays.toString(costs));
+        myGUI.println ("------------------------------");
+        myGUI.println ();
+        
+    }
     
 }

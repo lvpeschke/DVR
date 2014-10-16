@@ -168,7 +168,7 @@ Poisonous reverse fails if a count-to-infinity problem triggers a loop of three 
 Let us consider a network of 4 routers, $A$, $B$, $C$ and $D$. The network is represented below in Figure~\ref{fig:fail}. For this example, we will analyse partial routing tables which show the different path costs from one node to all of the others in the network. The example is inspired by~\cite{berkeley}.
 
 \begin{description}
-\item[Initial situation] Initially, all links have a cost of 1. The routing tables for nodes $A$ and $B$ are represented in Tables~\ref{tab:inita} and~\ref{tab:initb}. The least-cost routes to the different nodes in the network are emphasised in blue. In Table~\ref{tab:inita}, any path through $D$ has an $\infty$ cost because $A$ and $D$ are not connected, and to go via $D$, there is always a back-and-forth. In Table~\ref{tab:initb}, the two $\infty$ result directly from poisonous reverse, since $A$ and $C$ route through $B$ to get to $D$.
+\item[Initial situation] Initially, all links have a cost of $\infty$. The routing tables for nodes $A$ and $B$ are represented in Tables~\ref{tab:inita} and~\ref{tab:initb}. The least-cost routes to the different nodes in the network are emphasised in blue. In Table~\ref{tab:inita}, any path through $D$ has an $\infty$ cost because $A$ and $D$ are not connected, and to go via $D$, there is always a back-and-forth. In Table~\ref{tab:initb}, the two $\infty$ result directly from poisonous reverse, since $A$ and $C$ route through $B$ to get to $D$.
 
 \item[Step 1] The cost of the link between $B$ and $D$ changes from 1 to 50. $B$ and $D$ get the information and update their tables. $B$'s new routing table is given in Table~\ref{tab:step1}.
 
