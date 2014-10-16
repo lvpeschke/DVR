@@ -131,30 +131,44 @@ Teaching assistant :\\[0.2cm]
 % i
 \section{How distance vector routing works}
 \paragraph{In general}
-Distance vector routing uses a decentralized routing algorithm to find the least-cost path between routers in a network.
+Distance vector routing uses a decentralised routing algorithm to find the least-cost path between the routers in a network.
 The distance vector routing algorithm considers a network as an undirected graph of routers, represented as nodes, and links, represented as edges. It is iterative, asynchronous and distributed \cite[p.~371]{cn}. It makes use of the Bellman-Ford equation:
 \begin{equation}
 d_x(y) = \min_v\{c(x,v) + d_v(y)\}
 \label{eq:bf}
 \end{equation}
-The equation states that the cost of the least-cost path from node $x$ to $y$, $d_x(y)$, is the minimum of the sum of the cost to get from $x$ to a neighbor $v$ and the cost of the least-cost path from $v$ to $y$.
+The equation states that the cost of the least-cost path from node $x$ to $y$, $d_x(y)$, is the minimum of the sum of the cost to get from $x$ to a neighbour $v$ and the cost of the least-cost path from $v$ to $y$.
 
 The algorithm works by making the nodes exchange distance vectors.
-To make use of the equation, each node needs to know about all of the other nodes in the network and the cost to its direct neighbors. Let's walk through the algorithm step by step.
+To make use of the equation, each node needs to know about all of the other nodes in the network and the cost to its direct neighbours. Let's walk through the algorithm step by step.
 
 \begin{enumerate}
-\item Initially, each node knows the cost to its direct neighbors. It sends its distance vector to its neighbors.
+\item Initially, each node knows the cost to its direct neighbours. It sends its distance vector to its neighbours.
 
-\item Upon receiving an update (link cost change or new distance vector from a neighbor), a node recomputes its distance vector using the Bellman-Ford equation~(\ref{eq:bf}). If there is a change, it sends its own new vector to the all the neighbors.
+\item Upon receiving an update (link cost change or new distance vector from a neighbour), a node recomputes its distance vector using the Bellman-Ford equation~(\ref{eq:bf}). If there is a change, it sends its own new vector to all the neighbours.
 
-\item ``The process of receiving updated distance vectors from neighbors, recomputing routing table entries, and informing neighbors of changed costs of the least-cost path to a destination continues until no update messages are sent.''~\cite[p.~375]{cn}
+\item ``The process of receiving updated distance vectors from neighbours, recomputing routing table entries, and informing neighbours of changed costs of the least-cost path to a destination continues until no update messages are sent.''~\cite[p.~375]{cn}
 \end{enumerate}
 
 After step 3, the estimated costs have converged to the actual least-costs.
 
 % ii
 \section{How we tested the algorithm}
-\todo[inline]{wait for the code}
+We tested the algorithm  with the three different simulated networks provided. They contain 3, 4 and 5 nodes and are represented in Figure~7 at \cite{lab}.
+
+We timed the different executions (in ms) and compared them with each other.
+It is no surprise that the link change increases the convergence time, whereas the poisoned reverse decreases it again (which is its purpose). One value is surprising: the network with 5 nodes does not see any difference between an increase in link cost with and without poisoned reverse.
+\begin{table}[!ht]
+\centering
+\begin{tabular}{l||r|r|r}
+        &  Basic case         & Link change        &  Poisoned reverse\\
+        \hline
+        \hline
+3 nodes &  33.449  & 322.306   & 64.250 \\
+4 nodes &  93.796  & 20030.217 & 20023.406 \\
+5 nodes &  189.272 & 20021.531 & 20021.531 \\
+\end{tabular}
+\end{table}
 
 % iii
 \section{Poisoned reverse}
@@ -168,18 +182,18 @@ Poisonous reverse fails if a count-to-infinity problem triggers a loop of three 
 Let us consider a network of 4 routers, $A$, $B$, $C$ and $D$. The network is represented below in Figure~\ref{fig:fail}. For this example, we will analyse partial routing tables which show the different path costs from one node to all of the others in the network. The example is inspired by~\cite{berkeley}.
 
 \begin{description}
-\item[Initial situation] Initially, all links have a cost of $\infty$. The routing tables for nodes $A$ and $B$ are represented in Tables~\ref{tab:inita} and~\ref{tab:initb}. The least-cost routes to the different nodes in the network are emphasised in blue. In Table~\ref{tab:inita}, any path through $D$ has an $\infty$ cost because $A$ and $D$ are not connected, and to go via $D$, there is always a back-and-forth. In Table~\ref{tab:initb}, the two $\infty$ result directly from poisonous reverse, since $A$ and $C$ route through $B$ to get to $D$.
+\item[Initial situation] The routing tables for nodes $A$ and $B$ are represented in Tables~\ref{tab:inita} and~\ref{tab:initb}. The least-cost routes to the different nodes in the network are emphasised in blue. In Table~\ref{tab:inita}, any path through $D$ has an $\infty$ cost because $A$ and $D$ are not connected, and to go via $D$, there is always a back-and-forth. In Table~\ref{tab:initb}, the two $\infty$ result directly from poisonous reverse, since $A$ and $C$ route through $B$ to get to $D$.
 
 \item[Step 1] The cost of the link between $B$ and $D$ changes from 1 to 50. $B$ and $D$ get the information and update their tables. $B$'s new routing table is given in Table~\ref{tab:step1}.
 
-\item[Step 2] $B$ sends its updated table across the network. $A$ gets the information and updates its own table, given in Table~\ref{tab:step2}. $A$ believes there is a path via $C$, not knowing that $C$ also routes via $B$.
+\item[Step 2] $B$ sends its updated vector across the network. $A$ gets the information and updates its own table, given in Table~\ref{tab:step2}. $A$ believes there is a path via $C$, not knowing that $C$ also routes via $B$.
 
-\item[Step 3] $B$ gets the update from $A$ and updates its own table, as can be seen in Table~\ref{tab:step3}. As $A$ advertises a route through $C$, $B$ now also thinks there is a path with a lesser cost than 50 to $D$. From here on, we can see that a count-to-infinity situation occurs and will not stop until the actual cost is detected, requiring 47 more updates between $A$ and $B$ (leaving $C$ out).
+\item[Step 3] $B$ gets the update from $A$ and updates its own table, as can be seen in Table~\ref{tab:step3}. As $A$ advertises a route through $C$, $B$ now also thinks there is a path with a lesser cost than 50 to $D$. From here on, we can see that a count-to-infinity situation occurs and will not stop until the actual cost is detected, requiring 47 more updates between $A$ and $B$ (if we leave $C$ out).
 \end{description}
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=0.35\textwidth]{Fail.png}
+\includegraphics[width=0.32\textwidth]{Fail.png}
 \caption{Example topology where poisoned reverse fails.}
 \label{fig:fail}
 \end{figure}
@@ -257,10 +271,10 @@ D	&	\textcolor{Cyan}{4}	&	$\infty$	&	50			\\
 \end{table}
 
 \paragraph{Solutions}
-In practise, the Routing Information Protocol (RIP) uses DVR with poisoned reverse where infinity is 16 hops. This does not avoid the count-to-infinity problem, but limits the damage by stopping updates after it reaches `ìnfinity''.
-In addition, \textit{hold-down timers} can be used: if a route becomes unusable, it is kept in the tables with an infinity value for a certain amount of time. If an update advertises a better or equally good route, it is replaced. On the other hand, if the update indicates a worse cost, it is ignored. 
+In practise, the Routing Information Protocol (RIP) uses DVR with poisoned reverse where infinity is 16 hops. This does not avoid the count-to-infinity problem, but limits the damage by stopping updates after it reaches ``infinity''.
+In addition, \textit{hold-down timers} can be used: if a route becomes unusable, it is kept in the tables with an infinity value for a certain amount of time. If an update advertises a better or equally good route, it is replaced. On the other hand, if the update indicates a worse cost, it is ignored.~\cite{holddown}
 
-Another solution (which actually solves the problem) is using \textit{path vectors}: in addition to the distance vectors, we can keep a record of the path, i. e. the nodes traversed to obtain the cost. When a link cost increases or a link disappears from the network, a node can check if the path is still valid by looking it up. This is used in BGP~\cite{mit}.
+Another solution (which actually solves the problem) is using \textit{path vectors}: in addition to the distance vectors, we can keep a record of the path, i. e. the nodes traversed to obtain the cost. When a link cost increases or a link disappears from the network, a node can check if the path is still valid by looking it up. This is used in BGP, but involves more overhead~\cite{mit}.
 
 \bibliographystyle{alpha}
 \bibliography{biblio}

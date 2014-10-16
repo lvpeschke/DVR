@@ -1,4 +1,10 @@
-\begin{thebibliography}{She12}
+\begin{thebibliography}{Koz05}
+
+\bibitem[Koz05]{holddown}
+Charles~M. Kozierok.
+\newblock {\em The TCP/IP Guide}, chapter ``RIP Special Features For Resolving
+  RIP Algorithm Problems''.
+\newblock No Starsh Press, 3rd edition, September 2005.
 
 \bibitem[KR13]{cn}
 James~F. Kurose and Keith~W. Ross.
@@ -17,5 +23,12 @@ Prof. K.-Y.~(Sunny) Siu.
 \newblock Distance-vector routing (distributed {B}ellman-{F}ord algorithm).
 \newblock \url{http://web.mit.edu/course/2/2.993/www/lectures/lecture14.txt},
   April 1999.
+
+\bibitem[ZC13]{lab}
+Farrokh~Ghani Zadegan and Niklas Carlsson.
+\newblock Distance vector routing.
+\newblock
+  \url{https://www.ida.liu.se/~TDTS06/labs/2014/DV/default.html#Execution_of_the_Simulator},
+  August 2013.
 
 \end{thebibliography}
