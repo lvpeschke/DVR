@@ -148,7 +148,8 @@ public class RouterNode {
         Iterator<Integer> it = neighbors.iterator();
         while (it.hasNext()) {
             int next = it.next();
-            myGUI.println(F.format(" Node " + next, 16) + Arrays.toString(distance_table[next]));
+            myGUI.println(F.format(" Node " + next, 16)
+                          + F.format(distance_table[next], 7));
         }
         myGUI.println ("");
         // yourself
